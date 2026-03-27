@@ -37,9 +37,9 @@ export default async function AISettingsPage() {
     revalidatePath('/dashboard/ai-settings');
   }
 
-  // Simple test function just updating DB state for UI feedback purposes in this demo
-  async function testWebhook(webhookType: string, url: string) {
+  async function testWebhook(webhookType: string, formData: FormData) {
     'use server';
+    const url = formData.get('webhook_' + webhookType) as string;
     if (!url) return;
     try {
       // Setup payload matching the prompt
@@ -127,7 +127,7 @@ export default async function AISettingsPage() {
                    <input required type="url" name="webhook_new_patient" defaultValue={config?.webhook_new_patient || ''} className="flex-1 px-4 py-2.5 rounded-xl border border-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-sm" dir="ltr" placeholder="https://your-n8n.com/webhook/..." />
                    
                    <div className="flex gap-2">
-                     <button formAction={async () => { 'use server'; await testWebhook('new_patient', config?.webhook_new_patient || ''); }} formNoValidate className="bg-surface-2 hover:bg-border text-text px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border border-border shrink-0">
+                     <button formAction={testWebhook.bind(null, 'new_patient')} formNoValidate className="bg-surface-2 hover:bg-border text-text px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border border-border shrink-0">
                        <Activity size={16}/> اختبار
                      </button>
                      {testStatus['new_patient'] === 'success' && <span className="bg-success/10 text-success border border-success/20 px-3 py-2.5 rounded-xl text-sm font-bold shrink-0">✅</span>}
@@ -143,7 +143,7 @@ export default async function AISettingsPage() {
                    <input required type="url" name="webhook_book_appointment" defaultValue={config?.webhook_book_appointment || ''} className="flex-1 px-4 py-2.5 rounded-xl border border-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-sm" dir="ltr" placeholder="https://your-n8n.com/webhook/..." />
                    
                    <div className="flex gap-2">
-                     <button formAction={async () => { 'use server'; await testWebhook('book_appointment', config?.webhook_book_appointment || ''); }} formNoValidate className="bg-surface-2 hover:bg-border text-text px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border border-border shrink-0">
+                     <button formAction={testWebhook.bind(null, 'book_appointment')} formNoValidate className="bg-surface-2 hover:bg-border text-text px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border border-border shrink-0">
                        <Activity size={16}/> اختبار
                      </button>
                      {testStatus['book_appointment'] === 'success' && <span className="bg-success/10 text-success border border-success/20 px-3 py-2.5 rounded-xl text-sm font-bold shrink-0">✅</span>}
@@ -159,7 +159,7 @@ export default async function AISettingsPage() {
                    <input required type="url" name="webhook_confirm_appointment" defaultValue={config?.webhook_confirm_appointment || ''} className="flex-1 px-4 py-2.5 rounded-xl border border-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-sm" dir="ltr" placeholder="https://your-n8n.com/webhook/..." />
                    
                    <div className="flex gap-2">
-                     <button formAction={async () => { 'use server'; await testWebhook('confirm_appointment', config?.webhook_confirm_appointment || ''); }} formNoValidate className="bg-surface-2 hover:bg-border text-text px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border border-border shrink-0">
+                     <button formAction={testWebhook.bind(null, 'confirm_appointment')} formNoValidate className="bg-surface-2 hover:bg-border text-text px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border border-border shrink-0">
                        <Activity size={16}/> اختبار
                      </button>
                      {testStatus['confirm_appointment'] === 'success' && <span className="bg-success/10 text-success border border-success/20 px-3 py-2.5 rounded-xl text-sm font-bold shrink-0">✅</span>}
@@ -175,7 +175,7 @@ export default async function AISettingsPage() {
                    <input required type="url" name="webhook_patient_query" defaultValue={config?.webhook_patient_query || ''} className="flex-1 px-4 py-2.5 rounded-xl border border-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-surface text-sm" dir="ltr" placeholder="https://your-n8n.com/webhook/..." />
                    
                    <div className="flex gap-2">
-                     <button formAction={async () => { 'use server'; await testWebhook('patient_query', config?.webhook_patient_query || ''); }} formNoValidate className="bg-surface-2 hover:bg-border text-text px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border border-border shrink-0">
+                     <button formAction={testWebhook.bind(null, 'patient_query')} formNoValidate className="bg-surface-2 hover:bg-border text-text px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors border border-border shrink-0">
                        <Activity size={16}/> اختبار
                      </button>
                      {testStatus['patient_query'] === 'success' && <span className="bg-success/10 text-success border border-success/20 px-3 py-2.5 rounded-xl text-sm font-bold shrink-0">✅</span>}
