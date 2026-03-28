@@ -6,24 +6,37 @@ import { formatDate, formatTime, formatCurrency } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-export default async function PatientProfilePage({ params }: { params: { id: string } }) {
+export default async function PatientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createServerClient();
-  const { id } = params;
+  const { id } = await params;
 
-  // Fetch patient with relations
+  // Fetch only patient first to ensure it doesn't fail due to missing relations
   const { data: patient, error } = await supabase
     .from('patients')
-    .select(`
-      *,
-      appointments(*, service:services(name)),
-      visits(*, service:services(name))
-    `)
+    .select('*')
     .eq('id', id)
     .single();
 
   if (error || !patient) {
     notFound();
   }
+
+  // Safely fetch visits (if available)
+  const { data: visits, error: visitsError } = await supabase
+    .from('visits')
+    .select('*, service:services(name)')
+    .eq('patient_id', id)
+    .order('visit_date', { ascending: false });
+  
+  patient.visits = visitsError ? [] : visits || [];
+
+  // Safely fetch appointments (if available)
+  const { data: appointments, error: apptError } = await supabase
+    .from('appointments')
+    .select('*, service:services(name)')
+    .eq('patient_id', id);
+  
+  patient.appointments = apptError ? [] : appointments || [];
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">

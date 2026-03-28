@@ -32,6 +32,22 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
+    // Check if patient already exists by phone (prevent AI duplicates)
+    const { data: existingPatient, error: searchError } = await supabase
+      .from('patients')
+      .select('*')
+      .eq('phone', phone)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingPatient) {
+      return NextResponse.json({
+        success: true,
+        message: 'Patient already exists (duplicate prevented)',
+        patient: existingPatient,
+      }, { status: 200 });
+    }
+
     const patientData = {
       full_name,
       phone,
